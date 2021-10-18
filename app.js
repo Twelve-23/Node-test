@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 
 app.get('/getData', (req, res) => {
   const month = Number(req.query.month);
-  const summary = req.query.summary;
+  const summary = (req.query.summary  === 'true');
   if(!month){
     res.send('Missing Month Parameter');
     return;
@@ -25,7 +25,11 @@ app.get('/getData', (req, res) => {
     if(endMonth !== month){
       continue;
     }
-    out.push(period.itemized);
+	if (summary) {
+      out.push(period.summary)
+    } else {
+	  out.push(period.itemized);
+	}
   }
   res.json(out);
 })
