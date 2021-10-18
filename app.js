@@ -30,7 +30,7 @@ app.get('/getData', (req, res) => {
     keyName = `${keyName}-periods`
   }
 
-  // check if has on cash
+  // check if has on cache
   if (Cache.has(keyName)) {
     res.json(Cache.get(keyName));
     console.log("from cache", keyName);
@@ -48,11 +48,11 @@ app.get('/getData', (req, res) => {
       // if summary is given
       if (summary && (summary == "true" || summary == true)) {
         out.push(period.summary);
-        // store in cash
+        // store in cache
         Cache.put(keyName, out);
       } else {
         out.push(period.itemized);
-        // store in cash
+        // store in cache
         Cache.put(keyName, out);
       }
     }
