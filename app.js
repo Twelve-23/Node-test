@@ -8,7 +8,7 @@ const path = require('path');
 const CacheApi = require('node-filesystem-cache');
 const cachePath = path.join(__dirname, 'cache');
 const Cache = new CacheApi(cachePath);
-
+const cacheExpireTime = 36 * 1000;
 const data = require('./data.json');
 
 app.get('/', (req, res) => {
@@ -49,11 +49,11 @@ app.get('/getData', (req, res) => {
       if (summary && (summary == "true" || summary == true)) {
         out.push(period.summary);
         // store in cache
-        Cache.put(keyName, out);
+        Cache.add(keyName, out, cacheExpireTime);
       } else {
         out.push(period.itemized);
         // store in cache
-        Cache.put(keyName, out);
+        Cache.add(keyName, out, cacheExpireTime);
       }
     }
     res.json(out);
