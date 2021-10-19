@@ -19,14 +19,21 @@ app.get('/getData', (req, res) => {
   for(let period of data.periods){
     const startMonth = Number(period.period.start.split('-')[1]);
     const endMonth = Number(period.period.end.split('-')[1]);
+  
     if(startMonth !== month){
       continue;
     }
     if(endMonth !== month){
       continue;
     }
-    out.push(period.itemized);
-  }
+    if(!summary) {
+      out.push(period.itemized);
+    }
+   else {
+      out.push(period.summary)
+    }
+ }
+
   res.json(out);
 })
 
