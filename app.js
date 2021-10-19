@@ -1,35 +1,54 @@
 const express = require('express');
+
+const { getMonth } = require('./helpers/getMonth');
+
+const { getCacheKey, getCache, setCache, hasCache } = require('./helpers/cache-store');
+
 const app = express();
-const port = 3000;
 
-const data = require('./data.json');
+const { periods } = require('./constants/data.json');
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-})
+const port = process.env.PORT || 3000;
+
+app.get('/', (_, res) => res.send('App is running'));
 
 app.get('/getData', (req, res) => {
-  const month = Number(req.query.month);
-  const summary = req.query.summary;
-  if(!month){
-    res.send('Missing Month Parameter');
-    return;
-  }
-  let out = [];
-  for(let period of data.periods){
-    const startMonth = Number(period.period.start.split('-')[1]);
-    const endMonth = Number(period.period.end.split('-')[1]);
-    if(startMonth !== month){
-      continue;
-    }
-    if(endMonth !== month){
-      continue;
-    }
-    out.push(period.itemized);
-  }
-  res.json(out);
-})
+  let { summary, month } = req.query;
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-})
+  const isSummaryRequested = summary === 'true';
+
+  month = parseInt(month);
+
+  if (!month) {
+    res.status(400).json({ error: 'Month is required' });
+  }
+
+  const cacheKey = getCacheKey(month, isSummaryRequested);
+
+  if (hasCache(cacheKey)) {
+    const result = getCache(cacheKey);
+    res.status(200).json(result);
+  }
+  else{
+    res.status(200).json(getData(periods, month, isSummaryRequested, cacheKey));
+  }
+});
+
+const getData = (periods, month, isSummaryRequested, cacheKey) => {
+  const result = [];
+  periods.filter(({ itemized, summary, period: { start, end } }) => {
+    if (getMonth(start) == month || getMonth(end) == month) {
+      if (isSummaryRequested) {
+        result.push(summary);
+      }
+      else {
+        result.push(itemized);
+      }
+    }
+  });
+
+  setCache(`${cacheKey}`, result);
+  return result;
+};
+
+app.listen(port, () => console.log(`App is running on PORT ${port}`));
