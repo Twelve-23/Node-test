@@ -25,7 +25,11 @@ app.get('/getData', (req, res) => {
     if(endMonth !== month){
       continue;
     }
-    out.push(period.itemized);
+    if (summary === "true") {
+      out.push(period.summary);
+    } else {
+      out.push(period.itemized);
+    }
   }
   res.json(out);
 })
