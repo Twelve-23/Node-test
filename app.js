@@ -17,7 +17,6 @@ app.get('/getData', (req, res) => {
   //Generating key for first time request
   let Key  = `month_${month}`
   if (summary === "true") {
-  console.log('used summary true condition')
   Key = `month_${month}_summary`;
   }
 
@@ -26,11 +25,9 @@ app.get('/getData', (req, res) => {
     return;
   }
 
-  console.log(myCache.keys())
   //When we get value from cache 
   let value = myCache.get(Key)
   if (value) {
-    console.log('cache function is used')
     const data = myCache.get(Key)
     return res.json(data);
   }
